@@ -1,0 +1,17 @@
+{
+  "folders": [
+    {
+      "path": "./"
+    },
+    {
+      "path": "back"
+    },
+    {
+      "path": "front"
+    },
+  ],
+  "settings": {
+    "eslint.nodePath": "./front",
+    "compile-hero.disable-compile-files-on-did-save-code": true
+  }
+}

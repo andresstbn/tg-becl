@@ -1,0 +1,10 @@
+runtime: python310
+
+handlers:
+- url: /(.*\.(js|css|png|jpg))$
+  static_files: dist/\1
+  upload: dist/.*\.(js|css|png|jpg)$
+
+- url: /.*
+  static_files: dist/index.html
+  upload: dist/index.html

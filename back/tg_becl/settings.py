@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 import environ
-import os
 from urllib.parse import urlparse
 
 env = environ.Env()
@@ -26,12 +25,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&(-lgj#@20keiq(k%7ej^vwwug(&j(9btlrl0%&dpm1emxx_3)'
+SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('ENV') != 'PRODUCTION'
 
-ALLOWED_HOSTS = ['*']
+
+APPENGINE_URL = env("APPENGINE_URL", default=None)
+if APPENGINE_URL:
+    # Ensure a scheme is present in the URL before it's processed.
+    if not urlparse(APPENGINE_URL).scheme:
+        APPENGINE_URL = f"https://{APPENGINE_URL}"
+
+    ALLOWED_HOSTS = [urlparse(APPENGINE_URL).netloc]
+    SECURE_SSL_REDIRECT = True
+else:
+    ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -53,7 +62,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'works.apps.WorksConfig',
     'corsheaders',
-
+    'dj_rest_auth'
 ]
 
 MIDDLEWARE = [
@@ -130,6 +139,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = "./static"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -139,7 +149,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Configuracion tutorial all auth
 
-SITE_ID = 3
+SITE_ID = 2
 LOGIN_REDIRECT_URL = '/'
 CORS_ALLOW_ALL_ORIGINS = True
 REST_FRAMEWORK = {
@@ -147,8 +157,14 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+        # 'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
     ]
 }
+
+# REST_USE_JWT = True
+# JWT_AUTH_COOKIE = 'my-app-auth'
+# JWT_AUTH_REFRESH_COOKIE = 'my-refresh-token'
+
 # Additional configuration settings
 SOCIALACCOUNT_QUERY_EMAIL = True
 ACCOUNT_LOGOUT_ON_GET= True

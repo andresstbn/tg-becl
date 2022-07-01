@@ -3,6 +3,7 @@ import type { User } from '@/types'
 import { get } from '@/api'
 
 export default createStore({
+  strict: process.env.NODE_ENV !== 'production',
   state: {
     user: {} as User,
     token: ''
